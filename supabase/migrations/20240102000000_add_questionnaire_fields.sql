@@ -1,0 +1,22 @@
+-- Migration 002 : ajout des champs étendus du questionnaire de candidature
+alter table public.athlete_questionnaires
+  add column if not exists sexe                text,
+  add column if not exists coaching_type       text,
+  add column if not exists coaching_duree      text,
+  add column if not exists coaching_sport      text,
+  add column if not exists coaching_objectif   text,
+  add column if not exists objectif_course     text,
+  add column if not exists objectif_date       text,
+  add column if not exists objectif_temps      text,
+  add column if not exists autres_courses      text,
+  add column if not exists heures_par_semaine  text,
+  add column if not exists contraintes         text,
+  add column if not exists blessures           text,
+  add column if not exists montre_gps          boolean default false,
+  add column if not exists capteur_puissance   boolean default false,
+  add column if not exists home_trainer        boolean default false,
+  add column if not exists salle_muscu         boolean default false,
+  add column if not exists strava_connecte     boolean default false,
+  add column if not exists option_renfo        boolean default false,
+  add column if not exists niveau_suivi        text,
+  add column if not exists infos_complementaires text;
