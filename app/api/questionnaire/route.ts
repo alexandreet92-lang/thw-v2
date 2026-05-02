@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
-
-// Service-role client — bypasses RLS for trusted server-side inserts
-const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const COACHING_TYPES = ['pack', 'abonnement'] as const
 const NIVEAU_SUIVI = ['essentiel', 'standard', 'premium'] as const
@@ -97,6 +90,12 @@ export async function POST(request: NextRequest) {
     : []
 
   // ── Insert ───────────────────────────────────────────────────────────────────
+  // Client initialized here (not at module level) so build-time env vars are not required
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
   const { data, error } = await supabaseAdmin
     .from('athlete_questionnaires')
     .insert({
