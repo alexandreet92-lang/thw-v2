@@ -13,7 +13,7 @@ export function CandidaturesBadge() {
       const { count: pending } = await supabase
         .from('athlete_questionnaires')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
+        .eq('statut', 'nouveau')
       setCount(pending ?? 0)
     }
 

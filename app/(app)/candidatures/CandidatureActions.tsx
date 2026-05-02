@@ -3,57 +3,57 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { QuestionnaireStatus } from '@/types/database'
+import type { QuestionnaireStatut } from '@/types/database'
 
-const NEXT_STATUS: Partial<Record<QuestionnaireStatus, QuestionnaireStatus[]>> = {
-  pending: ['reviewed', 'accepted', 'rejected'],
-  reviewed: ['accepted', 'rejected'],
+const NEXT_STATUT: Partial<Record<QuestionnaireStatut, QuestionnaireStatut[]>> = {
+  nouveau:  ['en_cours', 'accepte', 'refuse'],
+  en_cours: ['accepte', 'refuse'],
 }
 
-const ACTION_LABELS: Record<QuestionnaireStatus, string> = {
-  pending: 'En attente',
-  reviewed: 'Examiner',
-  accepted: 'Accepter',
-  rejected: 'Refuser',
+const ACTION_LABELS: Record<QuestionnaireStatut, string> = {
+  nouveau:  'Nouveau',
+  en_cours: 'Prendre en charge',
+  accepte:  'Accepter',
+  refuse:   'Refuser',
 }
 
-const ACTION_STYLES: Record<QuestionnaireStatus, string> = {
-  pending: '',
-  reviewed: 'text-blue-600 hover:text-blue-800',
-  accepted: 'text-green-600 hover:text-green-800',
-  rejected: 'text-red-600 hover:text-red-800',
+const ACTION_STYLES: Record<QuestionnaireStatut, string> = {
+  nouveau:  '',
+  en_cours: 'text-blue-600 hover:text-blue-800',
+  accepte:  'text-green-600 hover:text-green-800',
+  refuse:   'text-red-600 hover:text-red-800',
 }
 
 interface Props {
   id: string
-  currentStatus: QuestionnaireStatus
+  currentStatut: QuestionnaireStatut
 }
 
-export function CandidatureActions({ id, currentStatus }: Props) {
+export function CandidatureActions({ id, currentStatut }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const nextStatuses = NEXT_STATUS[currentStatus] ?? []
+  const nextStatuts = NEXT_STATUT[currentStatut] ?? []
 
-  if (nextStatuses.length === 0) return <span className="text-xs text-gray-400">—</span>
+  if (nextStatuts.length === 0) return <span className="text-xs text-gray-400">—</span>
 
-  const handleUpdate = async (status: QuestionnaireStatus) => {
+  const handleUpdate = async (statut: QuestionnaireStatut) => {
     setLoading(true)
     const supabase = createClient()
-    await supabase.from('athlete_questionnaires').update({ status }).eq('id', id)
+    await supabase.from('athlete_questionnaires').update({ statut }).eq('id', id)
     setLoading(false)
     router.refresh()
   }
 
   return (
     <div className="flex items-center justify-end gap-3">
-      {nextStatuses.map((status) => (
+      {nextStatuts.map((statut) => (
         <button
-          key={status}
-          onClick={() => handleUpdate(status)}
+          key={statut}
+          onClick={() => handleUpdate(statut)}
           disabled={loading}
-          className={`text-sm font-medium transition-colors disabled:opacity-50 ${ACTION_STYLES[status]}`}
+          className={`text-sm font-medium transition-colors disabled:opacity-50 ${ACTION_STYLES[statut]}`}
         >
-          {ACTION_LABELS[status]}
+          {ACTION_LABELS[statut]}
         </button>
       ))}
     </div>
