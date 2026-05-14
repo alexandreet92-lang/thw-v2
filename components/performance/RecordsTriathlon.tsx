@@ -50,10 +50,10 @@ export function RecordsTriathlon({ raceResults }: Props) {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <p className="text-sm font-semibold text-gray-800 mb-3">Meilleurs temps par distance</p>
         <div className="space-y-2">
-          {[...byDistance.entries()].map(([dist, races]) => {
+          {Array.from(byDistance.entries()).map(([dist, races]) => {
             const best = races
               .filter((r) => !r.dnf && !r.dns)
-              .sort((a, b) => parseTimeToSecs(a.finish_time) - parseTimeToSecs(b.finish_time))[0]
+              .sort((a: RaceResultRow, b: RaceResultRow) => parseTimeToSecs(a.finish_time) - parseTimeToSecs(b.finish_time))[0]
             if (!best) return null
             return (
               <div key={dist} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">

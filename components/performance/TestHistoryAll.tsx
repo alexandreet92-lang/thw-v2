@@ -45,7 +45,7 @@ export function TestHistoryAll({ tests }: Props) {
     byMonth.get(key)!.push(t)
   }
 
-  const sortedMonths = [...byMonth.keys()].sort((a, b) => b.localeCompare(a))
+  const sortedMonths = Array.from(byMonth.keys()).sort((a, b) => b.localeCompare(a))
 
   return (
     <div className="space-y-5">
