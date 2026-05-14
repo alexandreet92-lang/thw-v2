@@ -164,7 +164,7 @@ export default function QuestionnairePage() {
     } else {
       setStatus('error')
       setErrorMessage(
-        'Une erreur est survenue lors de l'envoi. Merci de réessayer ou de nous contacter directement.'
+        "Une erreur est survenue lors de l’envoi. Merci de réessayer ou de nous contacter directement."
       )
     }
   }

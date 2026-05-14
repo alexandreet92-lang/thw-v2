@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
 
-// Service-role client — bypasses RLS for trusted server-side inserts
-const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const COACHING_TYPES = ['pack', 'abonnement'] as const
+const NIVEAU_SUIVI = ['essentiel', 'standard', 'premium'] as const
+const SEXE_VALUES = ['homme', 'femme', 'autre', 'non_precise'] as const
 
 export async function POST(request: NextRequest) {
   // ── Auth guard ──────────────────────────────────────────────────────────────
@@ -25,44 +22,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
+  // The website sends English field names — map them to the DB French schema
   const {
-    // Identité
-    first_name,
-    last_name,
+    first_name,   // → prenom
+    last_name,    // → nom
     email,
-    phone,
     age,
     sexe,
-    // Sport de base
-    sport,
-    current_level,
-    // Coaching souhaité
+    sport,        // → objectif_sport
     coaching_type,
     coaching_duree,
     coaching_sport,
     coaching_objectif,
-    // Objectifs course
     objectif_course,
     objectif_date,
     objectif_temps,
     autres_courses,
-    // Entraînement actuel
     heures_par_semaine,
     contraintes,
     blessures,
-    goals,
-    training_frequency,
-    availability,
-    // Équipement (booléens)
     montre_gps,
     capteur_puissance,
     home_trainer,
     salle_muscu,
     strava_connecte,
-    // Options
     option_renfo,
     niveau_suivi,
-    additional_info,
     infos_complementaires,
   } = body
 
@@ -73,46 +58,74 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const str = (v: unknown) => (v != null ? String(v) : null)
+  const str = (v: unknown) => (v != null && v !== '' ? String(v) : null)
   const bool = (v: unknown) => Boolean(v)
-  const num = (v: unknown) => (v != null ? Number(v) : null)
+
+  // Parse age — must be integer between 1 and 119 per DB check constraint
+  const ageNum = age != null ? parseInt(String(age), 10) : null
+  const safeAge = ageNum != null && ageNum > 0 && ageNum < 120 ? ageNum : null
+
+  // Parse heures_par_semaine — must be non-negative integer
+  const heuresNum = heures_par_semaine != null ? parseInt(String(heures_par_semaine), 10) : null
+  const safeHeures = heuresNum != null && heuresNum >= 0 ? heuresNum : null
+
+  // Validate enum fields against DB check constraints — set null if invalid
+  const safeCoachingType = COACHING_TYPES.includes(coaching_type as typeof COACHING_TYPES[number])
+    ? (coaching_type as 'pack' | 'abonnement')
+    : null
+
+  const safeNiveauSuivi = NIVEAU_SUIVI.includes(niveau_suivi as typeof NIVEAU_SUIVI[number])
+    ? (niveau_suivi as 'essentiel' | 'standard' | 'premium')
+    : null
+
+  const safeSexe = SEXE_VALUES.includes(sexe as typeof SEXE_VALUES[number])
+    ? (sexe as 'homme' | 'femme' | 'autre' | 'non_precise')
+    : null
+
+  // autres_courses — DB expects jsonb array; accept string (split by newline) or array
+  const autresCourses: string[] = Array.isArray(autres_courses)
+    ? autres_courses.map(String)
+    : typeof autres_courses === 'string' && autres_courses.trim()
+    ? autres_courses.split('\n').map((s) => s.trim()).filter(Boolean)
+    : []
 
   // ── Insert ───────────────────────────────────────────────────────────────────
+  // Client initialized here (not at module level) so build-time env vars are not required
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
   const { data, error } = await supabaseAdmin
     .from('athlete_questionnaires')
     .insert({
-      first_name: str(first_name)!,
-      last_name: str(last_name)!,
+      prenom: str(first_name)!,
+      nom: str(last_name)!,
       email: str(email)!,
-      phone: str(phone),
-      age: num(age),
-      sexe: str(sexe),
-      sport: str(sport),
-      current_level: str(current_level),
-      coaching_type: str(coaching_type),
+      age: safeAge,
+      sexe: safeSexe,
+      objectif_sport: str(sport),
+      coaching_type: safeCoachingType,
       coaching_duree: str(coaching_duree),
       coaching_sport: str(coaching_sport),
       coaching_objectif: str(coaching_objectif),
       objectif_course: str(objectif_course),
       objectif_date: str(objectif_date),
       objectif_temps: str(objectif_temps),
-      autres_courses: str(autres_courses),
-      heures_par_semaine: str(heures_par_semaine),
+      autres_courses: autresCourses,
+      heures_par_semaine: safeHeures,
+      jours_disponibles: [],
       contraintes: str(contraintes),
       blessures: str(blessures),
-      goals: str(goals),
-      training_frequency: str(training_frequency),
-      availability: str(availability),
       montre_gps: bool(montre_gps),
       capteur_puissance: bool(capteur_puissance),
       home_trainer: bool(home_trainer),
       salle_muscu: bool(salle_muscu),
       strava_connecte: bool(strava_connecte),
       option_renfo: bool(option_renfo),
-      niveau_suivi: str(niveau_suivi),
-      additional_info: str(additional_info),
+      niveau_suivi: safeNiveauSuivi,
       infos_complementaires: str(infos_complementaires),
-      status: 'pending',
+      statut: 'nouveau',
     })
     .select('id, created_at')
     .single()

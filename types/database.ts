@@ -1,48 +1,44 @@
-export type QuestionnaireStatus = 'pending' | 'reviewed' | 'accepted' | 'rejected'
+export type QuestionnaireStatut = 'nouveau' | 'en_cours' | 'accepte' | 'refuse'
 
 export interface AthleteQuestionnaire {
   id: string
   created_at: string
+  updated_at: string
   // Identité
-  first_name: string
-  last_name: string
+  prenom: string
+  nom: string
   email: string
-  phone: string | null
   age: number | null
-  sexe: string | null
-  // Sport de base
-  sport: string | null
-  current_level: string | null
-  // Coaching souhaité
-  coaching_type: string | null
-  coaching_duree: string | null
-  coaching_sport: string | null
-  coaching_objectif: string | null
-  // Objectifs course
+  sexe: 'homme' | 'femme' | 'autre' | 'non_precise' | null
+  // Objectifs sport
+  objectif_sport: string | null
   objectif_course: string | null
   objectif_date: string | null
   objectif_temps: string | null
-  autres_courses: string | null
-  // Entraînement actuel
-  heures_par_semaine: string | null
+  autres_courses: string[]
+  // Entraînement
+  heures_par_semaine: number | null
+  jours_disponibles: string[]
   contraintes: string | null
   blessures: string | null
-  goals: string | null
-  training_frequency: string | null
-  availability: string | null
   // Équipement
   montre_gps: boolean
   capteur_puissance: boolean
   home_trainer: boolean
   salle_muscu: boolean
   strava_connecte: boolean
+  // Coaching souhaité
+  coaching_type: 'pack' | 'abonnement' | null
+  coaching_duree: string | null
+  coaching_sport: string | null
+  coaching_objectif: string | null
   // Options
   option_renfo: boolean
-  niveau_suivi: string | null
-  additional_info: string | null
+  niveau_suivi: 'essentiel' | 'standard' | 'premium' | null
   infos_complementaires: string | null
-  // Gestion
-  status: QuestionnaireStatus
+  // Gestion coach
+  statut: QuestionnaireStatut
+  notes_coach: string | null
 }
 
 export interface Database {
@@ -50,8 +46,8 @@ export interface Database {
     Tables: {
       athlete_questionnaires: {
         Row: AthleteQuestionnaire
-        Insert: Omit<AthleteQuestionnaire, 'id' | 'created_at'>
-        Update: Partial<Omit<AthleteQuestionnaire, 'id' | 'created_at'>>
+        Insert: Omit<AthleteQuestionnaire, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<AthleteQuestionnaire, 'id' | 'created_at' | 'updated_at'>>
       }
     }
   }
