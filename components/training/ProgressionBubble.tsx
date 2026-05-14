@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import type { ProgressionPoint, RaceResult } from '@/app/(app)/training/page'
+import { SPORT_COLORS, SPORT_LABELS } from '@/lib/constants/sports'
 
 interface Props {
   efData: ProgressionPoint[]
@@ -17,26 +18,6 @@ const H = 220
 const PAD = { top: 16, right: 16, bottom: 40, left: 48 }
 const CHART_W = W - PAD.left - PAD.right
 const CHART_H = H - PAD.top - PAD.bottom
-
-const SPORT_LABELS: Record<string, string> = {
-  bike: 'Cyclisme',
-  virtual_bike: 'Home Trainer',
-  run: 'Running',
-  swim: 'Natation',
-  hyrox: 'Hyrox',
-  triathlon: 'Triathlon',
-  other: 'Autre',
-}
-
-const SPORT_COLORS: Record<string, string> = {
-  bike: '#3B82F6',
-  virtual_bike: '#60A5FA',
-  run: '#F97316',
-  swim: '#06B6D4',
-  hyrox: '#EF4444',
-  triathlon: '#8B5CF6',
-  other: '#6B7280',
-}
 
 export function ProgressionBubble({ efData, seuilData, raceResults }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>('sessions')
@@ -59,8 +40,14 @@ export function ProgressionBubble({ efData, seuilData, raceResults }: Props) {
     [data]
   )
 
-  const minWatts = useMemo(() => Math.min(...sorted.map((d) => d.avg_watts), 0) * 0.92, [sorted])
-  const maxWatts = useMemo(() => Math.max(...sorted.map((d) => d.avg_watts), 1) * 1.08, [sorted])
+  const minWatts = useMemo(() => {
+    if (sorted.length === 0) return 0
+    return Math.min(...sorted.map((d) => d.avg_watts)) * 0.92
+  }, [sorted])
+  const maxWatts = useMemo(() => {
+    if (sorted.length === 0) return 1
+    return Math.max(...sorted.map((d) => d.avg_watts)) * 1.08
+  }, [sorted])
 
   function xForMonth(month: string): number {
     if (sorted.length <= 1) return PAD.left + CHART_W / 2

@@ -34,10 +34,36 @@ const CHART_W = W - PAD.left - PAD.right
 const CHART_H = H - PAD.top - PAD.bottom
 const BAR_GAP = 8
 
-export function HRZoneChart({ activities, hrMax, zones: _zones }: Props) {
+// Build 5-zone HR boundaries from LTHR (Friel method) or fall back to % FCmax
+function buildZoneBoundaries(lthr: number | null, hrMax: number): [number, number, number, number, number, number] {
+  if (lthr && lthr > 0) {
+    // Friel 7-zone model condensed to 5 zones based on LTHR
+    return [
+      0,
+      Math.round(lthr * 0.81),   // Z1 < 81% LTHR
+      Math.round(lthr * 0.89),   // Z2 81–89% LTHR
+      Math.round(lthr * 0.94),   // Z3 90–94% LTHR (Tempo)
+      Math.round(lthr * 1.00),   // Z4 95–100% LTHR (Seuil)
+      Math.round(lthr * 1.06),   // Z5 > 100% LTHR
+    ]
+  }
+  const base = hrMax > 0 ? hrMax : 190
+  return [0, Math.round(base * 0.6), Math.round(base * 0.7), Math.round(base * 0.8), Math.round(base * 0.9), 999]
+}
+
+export function HRZoneChart({ activities, hrMax, zones }: Props) {
   const [showInfo, setShowInfo] = useState(false)
   const [hoveredZone, setHoveredZone] = useState<number | null>(null)
   const [sportFilter, setSportFilter] = useState<string>('all')
+
+  // Prefer LTHR from current zones if available
+  const lthr = useMemo(() => {
+    const bikeZone = zones.find((z) => z.sport === 'bike' || z.sport === 'run')
+    return (bikeZone as { lthr?: number })?.lthr ?? null
+  }, [zones])
+
+  const usingLTHR = lthr !== null && lthr > 0
+  const zoneBounds = useMemo(() => buildZoneBoundaries(lthr, hrMax), [lthr, hrMax])
 
   const availableSports = useMemo(() => {
     const s = new Set(activities.map((a) => a.sport_type))
@@ -50,22 +76,18 @@ export function HRZoneChart({ activities, hrMax, zones: _zones }: Props) {
   }, [activities, sportFilter])
 
   const zoneData: ZoneData[] = useMemo(() => {
-    const hrMaxVal = hrMax > 0 ? hrMax : 190
-    return ZONE_DEFS.map((z) => {
-      const minHR = z.minPct * hrMaxVal
-      const maxHR = z.maxPct * hrMaxVal
+    return ZONE_DEFS.map((z, i) => {
+      const minHR = zoneBounds[i]
+      const maxHR = zoneBounds[i + 1]
       let totalSec = 0
       for (const a of filtered) {
         if (a.avg_hr >= minHR && a.avg_hr < maxHR) {
           totalSec += a.moving_time_s
         }
       }
-      return {
-        ...z,
-        hours: totalSec / 3600,
-      }
+      return { ...z, hours: totalSec / 3600 }
     })
-  }, [filtered, hrMax])
+  }, [filtered, zoneBounds])
 
   const maxHours = Math.max(...zoneData.map((z) => z.hours), 0.1)
   const totalHours = zoneData.reduce((acc, z) => acc + z.hours, 0)
@@ -91,7 +113,10 @@ export function HRZoneChart({ activities, hrMax, zones: _zones }: Props) {
         <div>
           <p className="text-sm font-semibold text-gray-700">Durée cumulée par zone FC</p>
           <p className="text-xs text-gray-400 mt-0.5">
-            Total : {formatH(totalHours)} · FCmax estimée : {hrMax} bpm
+            Total : {formatH(totalHours)} ·{' '}
+            {usingLTHR
+              ? `Zones calculées via LTHR ${lthr} bpm`
+              : `FCmax estimée : ${hrMax} bpm`}
           </p>
         </div>
         <button
@@ -109,7 +134,10 @@ export function HRZoneChart({ activities, hrMax, zones: _zones }: Props) {
           <p className="font-semibold mb-1">Comment lire ce graphique ?</p>
           <p>
             Ce graphique montre le total d&apos;heures passées dans chaque zone de fréquence cardiaque,
-            calculé à partir de la FC moyenne de chaque séance et votre FCmax ({hrMax} bpm).
+            calculé à partir de la FC moyenne de chaque séance.{' '}
+            {usingLTHR
+              ? `Zones basées sur votre LTHR (${lthr} bpm) — méthode Friel, plus précise.`
+              : `Zones estimées via % FCmax (${hrMax} bpm). Renseignez votre LTHR dans votre profil pour plus de précision.`}
           </p>
           <p className="mt-1.5">
             <strong>Distribution idéale :</strong> ~80% en Z1-Z2 (endurance fondamentale),

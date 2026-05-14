@@ -39,13 +39,15 @@ function formatDuration(label: string): string {
   return label
 }
 
-const YEAR_COLORS: Record<number, string> = {
-  2026: '#3B82F6',
-  2025: '#F97316',
-  2024: '#8B5CF6',
-  2023: '#06B6D4',
-  2022: '#EF4444',
-  2021: '#6B7280',
+const PALETTE = [
+  '#3B82F6', '#F97316', '#8B5CF6', '#06B6D4',
+  '#EF4444', '#22C55E', '#EC4899', '#EAB308',
+]
+
+function getYearColor(year: number, allYears: number[]): string {
+  const sorted = [...allYears].sort((a, b) => b - a)
+  const idx = sorted.indexOf(year)
+  return PALETTE[idx % PALETTE.length] ?? '#6B7280'
 }
 
 const W = 460
@@ -156,7 +158,7 @@ export function PowerCurveChart({ data }: Props) {
       {/* Year selector */}
       <div className="flex gap-1 flex-wrap mb-3 mt-2">
         {years.map((y) => {
-          const color = YEAR_COLORS[y] ?? '#6B7280'
+          const color = getYearColor(y, Array.from(years))
           const active = selectedYears.has(y)
           return (
             <button
@@ -228,7 +230,7 @@ export function PowerCurveChart({ data }: Props) {
 
           {/* Lines per year */}
           {Array.from(byYear.entries()).map(([year, points]) => {
-            const color = YEAR_COLORS[year] ?? '#6B7280'
+            const color = getYearColor(year, Array.from(years))
             const pathData = points
               .map((pt, idx) => {
                 const li = allLabels.indexOf(pt.distance_label)
@@ -306,7 +308,7 @@ export function PowerCurveChart({ data }: Props) {
             <div key={y} className="flex items-center gap-1">
               <span
                 className="w-3 h-0.5 inline-block rounded"
-                style={{ backgroundColor: YEAR_COLORS[y] ?? '#6B7280' }}
+                style={{ backgroundColor: getYearColor(y, Array.from(years)) }}
               />
               <span className="text-xs text-gray-500">{y}</span>
             </div>
