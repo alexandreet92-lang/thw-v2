@@ -88,7 +88,7 @@ export function PowerCurveChart({ data }: Props) {
       arr.push(d)
       map.set(d.year, arr)
     }
-    for (const [year, arr] of map) {
+    for (const [year, arr] of Array.from(map.entries())) {
       map.set(
         year,
         arr.sort((a, b) => labelToSeconds(a.distance_label) - labelToSeconds(b.distance_label))

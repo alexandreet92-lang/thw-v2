@@ -32,12 +32,12 @@ export function YearDatasSection({ volumes }: Props) {
 
   const years = useMemo(() => {
     const yrs = new Set(volumes.map((v) => v.year))
-    return [...yrs].sort((a, b) => b - a)
+    return Array.from(yrs).sort((a, b) => b - a)
   }, [volumes])
 
   const sports = useMemo(() => {
     const sp = new Set(volumes.map((v) => v.sport_type))
-    return SPORT_ORDER.filter((s) => sp.has(s)).concat([...sp].filter((s) => !SPORT_ORDER.includes(s)))
+    return SPORT_ORDER.filter((s) => sp.has(s)).concat(Array.from(sp).filter((s) => !SPORT_ORDER.includes(s)))
   }, [volumes])
 
   // Aggregate by year
@@ -58,7 +58,7 @@ export function YearDatasSection({ volumes }: Props) {
 
   const maxVal = useMemo(() => {
     let m = 0
-    for (const [, y] of byYear) {
+    for (const [, y] of Array.from(byYear.entries())) {
       const val = viewMode === 'hours' ? y.total_hours : viewMode === 'sessions' ? y.sessions : y.distance
       if (val > m) m = val
     }

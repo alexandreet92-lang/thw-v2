@@ -44,7 +44,7 @@ export function RecordsCyclisme({ personalRecords }: Props) {
     return map
   }, [personalRecords])
 
-  const allYears = useMemo(() => [...powerByYear.keys()].sort((a, b) => b - a), [powerByYear])
+  const allYears = useMemo(() => Array.from(powerByYear.keys()).sort((a, b) => b - a), [powerByYear])
 
   useEffect(() => {
     if (activeYears === null && allYears.length > 0) {
@@ -65,13 +65,13 @@ export function RecordsCyclisme({ personalRecords }: Props) {
   const chartH = H - PT - PB
 
   const labels = POWER_ORDER.filter((l) => {
-    for (const yr of visibleYears) {
+    for (const yr of Array.from(visibleYears)) {
       if (powerByYear.get(yr)?.has(l)) return true
     }
     return false
   })
 
-  const allWatts = [...visibleYears].flatMap((yr) =>
+  const allWatts = Array.from(visibleYears).flatMap((yr) =>
     labels.map((l) => powerByYear.get(yr)?.get(l)).filter((v): v is number => v !== undefined)
   )
   const minW = allWatts.length > 0 ? Math.min(...allWatts) * 0.9 : 0
@@ -165,7 +165,7 @@ export function RecordsCyclisme({ personalRecords }: Props) {
               ))}
 
               {/* Lines per year */}
-              {[...visibleYears].sort((a, b) => a - b).map((yr) => {
+              {Array.from(visibleYears).sort((a, b) => a - b).map((yr) => {
                 const color = getYearColor(yr, allYears)
                 const pts = labels
                   .map((l) => ({ l, w: powerByYear.get(yr)?.get(l) }))

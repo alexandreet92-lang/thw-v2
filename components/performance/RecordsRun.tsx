@@ -48,7 +48,7 @@ export function RecordsRun({ personalRecords, raceResults }: Props) {
       const y = r.year ?? new Date(r.achieved_at).getFullYear()
       yrs.add(y)
     })
-    return [...yrs].sort((a, b) => b - a)
+    return Array.from(yrs).sort((a, b) => b - a)
   }, [personalRecords])
 
   // Best PR per year per distance
@@ -73,7 +73,7 @@ export function RecordsRun({ personalRecords, raceResults }: Props) {
   }, [personalRecords])
 
   const distances = useMemo(() => {
-    const all = [...prByDistance.keys()]
+    const all = Array.from(prByDistance.keys())
     return [...DISTANCE_ORDER.filter((d) => all.includes(d)), ...all.filter((d) => !DISTANCE_ORDER.includes(d))]
   }, [prByDistance])
 
@@ -108,7 +108,7 @@ export function RecordsRun({ personalRecords, raceResults }: Props) {
               <tbody>
                 {distances.map((dist) => {
                   const byYear = bestByYearDist.get(dist)
-                  const allPerfs = [...(byYear?.values() ?? [])]
+                  const allPerfs = Array.from(byYear?.values() ?? [])
                   const bestSecs = allPerfs.reduce((best, r) => {
                     const s = parseSeconds(r.performance, r.performance_unit)
                     return s > 0 && (best === 0 || s < best) ? s : best

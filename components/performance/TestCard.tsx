@@ -19,7 +19,7 @@ interface Props {
   sport: string
   userId: string
   fields: Field[]
-  pastTests: TestEntry[]
+  tests: TestEntry[]
   onAdd: (t: TestEntry) => void
   protocol?: React.ReactNode
 }
@@ -31,7 +31,7 @@ function formatFieldValue(value: unknown, field: Field): string {
   return `${value}`
 }
 
-export function TestCard({ title, description, testType, sport, userId, fields, pastTests, onAdd, protocol }: Props) {
+export function TestCard({ title, description, testType, sport, userId, fields, tests, onAdd, protocol }: Props) {
   const [open, setOpen] = useState(false)
   const [showProtocol, setShowProtocol] = useState(false)
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -63,7 +63,7 @@ export function TestCard({ title, description, testType, sport, userId, fields, 
     }
   }
 
-  const recentTests = pastTests.filter((t) => t.test_type === testType).slice(0, 5)
+  const recentTests = tests.filter((t) => t.test_type === testType).slice(0, 5)
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
