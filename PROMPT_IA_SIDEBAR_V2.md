@@ -124,3 +124,4 @@ LogoShuriken 52px centré + titre greeting + sous-titre "Comment puis-je t'aider
 | `app/globals.css` | MODIFIER (animations sidebar) |
 | `components/sidebar/Sidebar.tsx` | MODIFIER (lien /ai) |
 | Migration `ai_conversations` | APPLIQUER |
+
