@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CandidaturesBadge } from './CandidaturesBadge'
+import { LogoShuriken } from '@/components/ui/LogoShuriken'
 
 const navItems = [
   {
@@ -21,6 +22,13 @@ const navItems = [
     ),
   },
   {
+    href: '/ai',
+    label: 'Assistant IA',
+    icon: (
+      <LogoShuriken size={20} color="#2563EB" />
+    ),
+  },
+  {
     href: '/performance',
     label: 'Performance',
     icon: (
@@ -35,7 +43,8 @@ export function Sidebar() {
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-gray-200 px-6">
+      <div className="flex h-16 items-center border-b border-gray-200 px-6 gap-2.5">
+        <LogoShuriken size={22} color="#2563EB" />
         <span className="text-lg font-bold tracking-tight text-gray-900">THW Coaching</span>
       </div>
 
