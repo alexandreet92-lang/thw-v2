@@ -23,7 +23,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="pft"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'run_1500m_s', label: 'Run 1500m', type: 'time', unit: 'mm:ss', placeholder: 'ex: 05:30' },
@@ -52,7 +52,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="bbj"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'time_200m_s', label: 'Temps 200m BBJ', type: 'time', unit: 'mm:ss', placeholder: 'ex: 04:30' },
@@ -79,7 +79,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="farmer_carry_max"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'weight_kg', label: 'Poids par main', type: 'number', unit: 'kg' },
@@ -105,7 +105,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="wall_ball_1min"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'ball_weight_kg', label: 'Poids medball', type: 'number', unit: 'kg', placeholder: 'ex: 6 ou 9' },
@@ -130,7 +130,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="wall_ball_5min"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'ball_weight_kg', label: 'Poids medball', type: 'number', unit: 'kg', placeholder: 'ex: 6 ou 9' },
@@ -154,7 +154,7 @@ export function HyroxTests({ userId, tests, onAdd }: Props) {
         testType="run_compromised"
         sport="hyrox"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'run1_time', label: 'Run 1km avant (temps)', type: 'time', unit: 'mm:ss', placeholder: 'ex: 04:00' },
