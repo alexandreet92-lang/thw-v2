@@ -22,7 +22,7 @@ export function CyclismeTests({ userId, tests, onAdd }: Props) {
         testType="endurance_4h"
         sport="bike"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'duration_min', label: 'Durée réelle', type: 'number', unit: 'min' },
@@ -50,7 +50,7 @@ export function CyclismeTests({ userId, tests, onAdd }: Props) {
         testType="progressive_ef"
         sport="bike"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'ef_zone2', label: 'EF Zone 2', type: 'number', placeholder: 'ex: 1.85' },
@@ -76,7 +76,7 @@ export function CyclismeTests({ userId, tests, onAdd }: Props) {
         testType="endurance_ftp"
         sport="bike"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'endurance_avg_watts', label: 'Watts endurance (2h30)', type: 'number', unit: 'W' },

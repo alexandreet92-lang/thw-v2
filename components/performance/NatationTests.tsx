@@ -22,7 +22,7 @@ export function NatationTests({ userId, tests, onAdd }: Props) {
         testType="hypoxie_crawl"
         sport="swim"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'distance_m', label: 'Distance sans respiration', type: 'number', unit: 'm', placeholder: 'ex: 25' },
@@ -51,7 +51,7 @@ export function NatationTests({ userId, tests, onAdd }: Props) {
         testType="css_swim"
         sport="swim"
         userId={userId}
-        tests={tests}
+        pastTests={tests}
         onAdd={onAdd}
         fields={[
           { key: 'time_400m_s', label: 'Temps 400m', type: 'time', unit: 'mm:ss', placeholder: 'ex: 06:30' },
